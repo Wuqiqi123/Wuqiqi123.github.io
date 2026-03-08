@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>Docs on Qiqi Wu blog</title><link>https://Wuqiqi123.github.io/docs/</link><description>Recent content in Docs on Qiqi Wu blog</description><generator>Hugo -- 0.152.2</generator><language>en-us</language><lastBuildDate>Wed, 17 Dec 2025 23:00:05 +0800</lastBuildDate><atom:link href="https://Wuqiqi123.github.io/docs/index.xml" rel="self" type="application/rss+xml"/><item><title>从随机微分方程SDE到扩散模型</title><link>https://Wuqiqi123.github.io/docs/from_sde_to_diffusion/</link><pubDate>Wed, 17 Dec 2025 23:00:05 +0800</pubDate><guid>https://Wuqiqi123.github.io/docs/from_sde_to_diffusion/</guid><description>&lt;h1 id="随机微分方程-sde"&gt;随机微分方程 (SDE)&lt;/h1&gt;
 &lt;p&gt;一般的微分方程可以表示为：&lt;/p&gt;
-$$\frac{d\textbf{x}}{dt} = f(\textbf{x},t)$$&lt;p&gt;几乎所有更高阶的微分方程都可以转化为这种一阶形式。例如，一个二阶系统（如牛顿第二定律 $F=ma$）可以通过引入辅助变量（令速度 $v = \dot{x}$），将其改写为两个一阶方程组成的向量形式：&lt;/p&gt;
-$$\frac{d}{dt} \begin{bmatrix} x \\ v \end{bmatrix} = \begin{bmatrix} v \\ \frac{F}{m} \end{bmatrix}$$&lt;p&gt; 然而，在许多现实世界的系统中，存在随机性或不确定性，这时我们需要引入随机微分方程 (SDE) 来描述这些系统。&lt;/p&gt;
-&lt;p&gt;随机微分方程在传统微分方程的基础上，加入了一个随机过程项，通常表示为Wiener过程。一个典型的随机微分方程形式为：
+$$\frac{d\textbf{x}}{dt} = f(\textbf{x},t)$$&lt;p&gt;几乎所有更高阶的微分方程都可以转化为这种一阶形式。例如，一个二阶系统（如牛顿第二定律 $F=ma$）可以通过引入辅助变量（令速度 $v = \dot{x}$），将其改写为两个一阶方程组成的向量形式：
 &lt;/p&gt;
-$$d\textbf{x} = f(\textbf{x},t)dt + g(\textbf{x},t)d\textbf{W}_t$$&lt;p&gt;
-其中$f(\mathbf{x}_t, t)$ 是漂移项。$g(t)$ 是扩散项。$\text{d}\mathbf{W}_t$是标准维纳过程。
-例如，在slam系统中， imu传感器的bias可以建模为一个随机游走过程：
+$$\frac{d}{dt} \begin{bmatrix} x \\ v \end{bmatrix} = \begin{bmatrix} v \\ \frac{F}{m} \end{bmatrix}$$&lt;p&gt;
+然而，在许多现实世界的系统中，存在随机性或不确定性，这时我们需要引入随机微分方程 (SDE) 来描述这些系统。
+随机微分方程在传统微分方程的基础上，加入了一个随机过程项，通常表示为Wiener过程, SDE 的一般形式可以写成：
+\begin{equation}\label{eq:SDE_general}
+d\textbf{x} = f(\textbf{x},t)dt + g(\textbf{x},t)d\textbf{W}_t
+\end{equation}&lt;/p&gt;
+&lt;p&gt;其中$f(\mathbf{x}_t, t)$ 是漂移项。$g(t)$ 是扩散项。$d\mathbf{W}_t$是标准维纳过程：&lt;/p&gt;
+&lt;p&gt;维纳过程具有以下核心统计特性，增量 $d\textbf{W}_t = \textbf{W}_{t+dt} - \textbf{W}_t$ 服从均值为向量零、协方差矩阵为 $\textbf{I}dt$ 的正态分布：&lt;/p&gt;
+$$d\textbf{W}_t \sim \mathcal{N}(\textbf{0}, \textbf{I}dt)$$&lt;p&gt;
+具体来说，它的期望和协方差可以分别表示为：
 &lt;/p&gt;
-$$d\textbf{b} = \sigma d\textbf{W}_t$$&lt;p&gt;
-其离散化形式为：
+$$\mathbb{E}[d\textbf{W}_t] = \textbf{0}$$&lt;p&gt;
 &lt;/p&gt;
-$$
-\mathbf{b}_{k+1} = \mathbf{b}_k + \mathbf{W}_{b,k}, \quad \mathbf{W}_{b,k} \sim \mathcal{N}(0, \Delta t \sigma_{b}^2 ) \\
-$$&lt;p&gt;该式描述了bias的方差在每个时间步长 $\Delta t$ 上的变化， 随时间步长线性增长，$\sigma$ 控制了随机游走的强度， 这意味着，随着时间推移，不确定性的范围以时间平方根的速率扩散。&lt;/p&gt;
-&lt;h2 id="推导福克-普朗克方程-fpe"&gt;推导福克-普朗克方程 (FPE)&lt;/h2&gt;
-&lt;p&gt;随机微分方程 (SDE) 描述了系统状态的随机演化，而福克-普朗克方程 (FPE) 则描述了系统状态概率密度函数 (PDF) 随时间的变化。通过从 SDE 推导 FPE，我们可以理解系统状态的统计行为。
-维纳过程具有以下核心统计特性， 增量 $dW_t = W_{t+dt} - W_t$ 服从正态分布：
-&lt;/p&gt;</description></item></channel></rss>
+$$\text{Var}(d\textbf{W}_t) = \mathbb{E}[d\textbf{W}_t d\textbf{W}_t^T] = \textbf{I}dt$$&lt;p&gt;例如通常在 SLAM 系统中，IMU 传感器的 bias（零偏）可以建模为一个随机游走（Random Walk）过程，其连续时间导数由强度为 $\sigma_b$ 的高斯白噪声 $\mathbf{n}_b(t)$驱动：&lt;/p&gt;</description></item></channel></rss>
